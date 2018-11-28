@@ -24,6 +24,7 @@ var checkSlots = (request, client, jar) => {
 		var $ = require('cheerio').load(body);
 
 		var figures = $($('strong')[0]).text().split(/ \/ /);
+		console.log(figures);
 
 		if (parseInt(figures[0]) < parseInt(figures[1])) {
 			var users = process.env.DISCORD_USERIDS_TO_NOTIFY.split(/,/);
