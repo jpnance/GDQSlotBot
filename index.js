@@ -5,6 +5,8 @@ var client = new Discord.Client();
 
 var request = require('request');
 
+var coolDown = false;
+
 client.once('ready', () => {
 	console.log('in there');
 
@@ -27,20 +29,28 @@ var checkSlots = (request, client, jar) => {
 		console.log(figures);
 
 		if (parseInt(figures[0]) < parseInt(figures[1])) {
-			var users = process.env.DISCORD_USERIDS_TO_NOTIFY.split(/,/);
-			var channel = client.channels.get(process.env.DISCORD_CHANNELID_TO_NOTIFY);
+			if (!coolDown || Math.floor(Math.random() * 120) < 2) {
+				coolDown = true;
 
-			var message = '';
+				var users = process.env.DISCORD_USERIDS_TO_NOTIFY.split(/,/);
+				var channel = client.channels.get(process.env.DISCORD_CHANNELID_TO_NOTIFY);
 
-			users.forEach(userId => {
-				message += '<@' + userId + '> ';
-			});
+				var message = '';
 
-			channel.send(message + ' looks like there\'s a slot available (' + figures[0] + '/' + figures[1] + '). go go go. https://gamesdonequick.com/profile');
+				users.forEach(userId => {
+					message += '<@' + userId + '> ';
+				});
+
+				channel.send(message + ' looks like there\'s a slot available (' + figures[0] + '/' + figures[1] + '). go go go. https://gamesdonequick.com/profile');
+			}
 		}
-		else if (Math.floor(Math.random() * 120) == 0) {
-			var user = client.users.get(process.env.DISCORD_HEARTBEAT_USERID);
-			user.send('i\'m still working. (' + figures[0] + '/' + figures[1] + ')');
+		else {
+			coolDown = false;
+
+			if (Math.floor(Math.random() * 120) == 0) {
+				var user = client.users.get(process.env.DISCORD_HEARTBEAT_USERID);
+				user.send('i\'m still working. (' + figures[0] + '/' + figures[1] + ')');
+			}
 		}
 	});
 };
